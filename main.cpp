@@ -1,412 +1,196 @@
-// #include <Arduino.h>
-// #include <Adafruit_SSD1306.h>
-// #include <LiquidCrystal_I2C.h>
-
-// #define LED1 8
-// #define LED2 9
-// #define BUZZER 7
-// #define BUTTON 6
-// #define SDA 4
-// #define SCL 5
-// #define sensor1 10
-// bool button_state = false;
-// unsigned long pre_time = 0;
-// unsigned long time2 = 0;
-// LiquidCrystal_I2C lcd(0x27, 20, 4);
-
-// // Timer
-// hw_timer_t * timer = NULL;
-// volatile bool alarmActive = false;
-// volatile bool blinkFlag = false;
-
-// // Hàm ngắt Timer (500ms)
-// void IRAM_ATTR onTimer() {
-//   if (alarmActive) {
-//     blinkFlag = !blinkFlag;  // đổi trạng thái LED/buzzer
-//   }
-// }
-
-// void IRAM_ATTR handleInterrupt()
-// {
-//   button_state = !button_state;
-  
-// }
-
-// void timer_init()
-// {
-//    // Khởi tạo timer: tick mỗi 500ms
-//   timer = timerBegin(0, 80, true);               // 80 MHz / 80 = 1 MHz → 1 tick = 1 µs
-//   timerAttachInterrupt(timer, &onTimer, true);
-//   timerAlarmWrite(timer, 500000, true);          // 500000 µs = 500 ms
-//   timerAlarmEnable(timer);
-// }
-
-// void setup()
-// {
-//   Serial.begin(9600);
-//   Wire.begin(SDA, SCL);
-//   lcd.init();
-//   lcd.backlight();
-
-//   pinMode(LED1, OUTPUT);
-//   pinMode(LED2, OUTPUT);
-//   pinMode(BUZZER, OUTPUT);
-//   pinMode(BUTTON, INPUT_PULLUP);
-//   pinMode(sensor1, INPUT);
-//   attachInterrupt(digitalPinToInterrupt(BUTTON), handleInterrupt, FALLING);
-
-//   timer_init();
-
-//   lcd.setCursor(6,0);
-//   lcd.print("TU THUOC");
-//   lcd.setCursor(4,2);
-//   lcd.print("Chua den gio!");
-//   digitalWrite(BUZZER, 0);
-//   digitalWrite(LED1, 1);
-//   time2 = millis();
-// }
-
-
-
-// void loop()
-// {
-//   // tone(BUZZER, 500, 2000);
-//   // delay(3000);
-//   // if(millis() - time2 < 5000)
-//   // {
-
-//   //   digitalWrite(LED1, 1);
-//   //   digitalWrite(LED2, 0);
-//   //   tone(BUZZER, 500, 2000);
-//   //   //noTone(BUZZER);
-//   // }
-
-//   // else if(millis() - time2 < 10000)
-//   // {
-//   //   digitalWrite(LED1, 0);
-//   //   digitalWrite(LED2, 1);
-//   //   tone(BUZZER, 500, 2000);
-//   //   //noTone(BUZZER);
-//   // }
-//   // else if(millis() - time2 < 20000)
-//   // {
-//   //   time2 = millis();
-//   // }
-
-//   //Serial.println(button_state);
-//   // Serial.println(digitalRead(sensor1));
-//   // if(digitalRead(sensor1))
-//   // {
-//   //   digitalWrite(LED2, 0);
-//   // }
-//   // else
-//   // {
-//   //   digitalWrite(LED2, 1);
-//   // }
-//   // if(button_state)
-//   // {
-//   //   pre_time = millis();
-//   //   lcd.setCursor(1,1);
-//   //   lcd.print("Xac nhan lay thuoc");
-//   //   lcd.setCursor(4,2);
-//   //   lcd.print("             ");
-//   //   digitalWrite(LED1, 0);
-//   //   digitalWrite(LED2, 0);
-//   //   delay(500);
-//   //   button_state = !button_state;
-//   // }
-//   // else
-//   // {
-//   //   if(millis() - pre_time > 5000)
-//   //   {
-//   //     lcd.setCursor(0,1);
-//   //     lcd.print("                     ");
-//   //     lcd.setCursor(4,2);
-//   //     lcd.print("Chua den gio!");
-//   //     digitalWrite(LED1, 1);
-//   //   }
-//   // }
-
-  
-//   digitalWrite(LED1, blinkFlag);
-// }
-
-// #include "Arduino.h"
-// #include <WiFi.h>
-// #include <WebServer.h>
-// #include <LiquidCrystal_I2C.h>
-// #include <index.h>
-
-// #define LED_PIN 8 
-// #define BUZZER 7
-// #define LED1 8
-// #define LED2 9
-// #define BUZZER 7
-// #define BUTTON 6
-// #define SDA 4
-// #define SCL 5
-// #define sensor1 10
-// bool button_state = false;
-// unsigned long pre_time = 0;
-// unsigned long time2 = 0;
-
-// volatile bool activeAlarm = false;
-// const char* ssid = "Son Tra";
-// const char* pass = "L02012001";
-// uint8_t drawer = 1;
-// uint8_t status = 0;  // trang thai da uong thuoc chua 0(chua toi gio), 1(den gio), 2(da uong thuoc)
-// /* cac bien luu cho webserver*/
-// String real_time = "00:00";
-// String morning_time = "07:00";
-// String noon_time = "12:00";
-// String evening_time = "19:00";
-
-
-// class Time {
-//   public:
-//   volatile uint8_t second = 0;
-//   volatile uint8_t minute;
-//   volatile uint8_t hour;
-
-//   struct AlarmField{ 
-//     uint8_t morning = 0;
-//     uint8_t afternoon = 0;
-//     uint8_t evening = 0;
-//   } ;
-
-//   AlarmField minuteAlarm;
-//   AlarmField hourAlarm;
-
-// };
-
-
-// hw_timer_t * timer = NULL;
-// Time myTime;
-// LiquidCrystal_I2C lcd(0x27, 20, 4);
-// WebServer server(80);
-
-
-// void IRAM_ATTR onTimer() {
-//   myTime.second++;
-//   if(myTime.second >= 60) {
-//     myTime.second = 0;
-//     myTime.minute++;
-//     if(myTime.minute >= 60) {
-//       myTime.minute = 0;
-//       myTime.hour++;
-//       if(myTime.hour >= 24) {
-//         myTime.hour = 0;
-//       }
-//     }
-//   }
-
-//   if(myTime.hour == myTime.hourAlarm.morning && myTime.minute == myTime.minuteAlarm.morning || 
-//      myTime.hour == myTime.hourAlarm.afternoon && myTime.minute == myTime.minuteAlarm.afternoon ||
-//      myTime.hour == myTime.hourAlarm.evening && myTime.minute == myTime.minuteAlarm.evening) 
-//   {
-//     activeAlarm = true;
-//   } 
-//   else 
-//   {
-//     activeAlarm = false;
-//   }
-// }
-
-// //giao dien chinh
-// void homePage() {
-//   server.send_P(200, "text/html", MAIN_page);
-// }
-
-// // Gửi thời gian thật và thời gian hẹn (JSON)
-// void handleTime() {
-//   char buff[200];
-//   const char* statusText;
-//   if(status == 0)
-//   {
-//     statusText = "Chưa tới giờ uống thuốc";
-//   }
-//   else if(status == 1)
-//   {
-//     statusText = "Đã đến giờ uống thuốc";
-//   }
-//   sprintf(buff,
-//     "{\"time\":\"%02d:%02d:%02d\","
-//     "\"morning\":\"%02d:%02d\","
-//     "\"noon\":\"%02d:%02d\","
-//     "\"evening\":\"%02d:%02d\","
-//     "\"status\":\"%s\"}",
-//     myTime.hour, myTime.minute, myTime.second,
-//     myTime.hourAlarm.morning, myTime.minuteAlarm.morning,
-//     myTime.hourAlarm.afternoon, myTime.minuteAlarm.afternoon,
-//     myTime.hourAlarm.evening, myTime.minuteAlarm.evening, 
-//     statusText
-//   );
-//   server.send(200, "application/json", buff);
-// }
-
-// // Nhận dữ liệu khi người dùng nhấn “Lưu”
-// void handleSaveRealTime() {
-//   if (server.hasArg("real")) real_time = server.arg("real");
-  
-//   String msg = "Đã lưu thời gian thực: " + real_time;
-//   // Cập nhật giờ thực tế
-//   int h,m;
-//   sscanf(real_time.c_str(), "%2d:%2d", &h, &m);
-//   myTime.hour = h;
-//   myTime.minute = m;
-//   myTime.second = 0;
-//   // Gửi phản hồi về trình duyệt  
-//   server.send(200, "text/plain", msg);
-// }
-
-// void handleSaveSchedule() {
-//   if (server.hasArg("morning")) morning_time = server.arg("morning");
-//   if (server.hasArg("noon")) noon_time = server.arg("noon");
-//   if (server.hasArg("evening")) evening_time = server.arg("evening");
-//   if(server.hasArg("drawer")) drawer = server.arg("drawer").toInt();
-//   String msg = "Đã lưu giờ hẹn: Sáng " + morning_time + ", Trưa " + noon_time + ", Tối " + evening_time;
-//   // Cập nhật giờ thực tế
-//   int h,m;
-//   // Cập nhật giờ hẹn
-//   sscanf(morning_time.c_str(), "%d:%d", &h, &m);
-//   myTime.hourAlarm.morning = h;
-//   myTime.minuteAlarm.morning = m;
-
-//   sscanf(noon_time.c_str(), "%d:%d", &h, &m);
-//   myTime.hourAlarm.afternoon = h;
-//   myTime.minuteAlarm.afternoon = m;
-
-//   sscanf(evening_time.c_str(), "%d:%d", &h, &m);
-//   myTime.hourAlarm.evening = h;
-//   myTime.minuteAlarm.evening = m;
-//   // Gửi phản hồi về trình duyệt  
-//   server.send(200, "text/plain", msg);
-// }
-
-
-// void timer_init()
-// {
-//   timer = timerBegin(0, 80, true);  // timer 0, prescaler 80, count up
-//   timerAttachInterrupt(timer, &onTimer, true);  // khai bao ham ngat
-//   timerAlarmWrite(timer, 1000000, true); // 1000000us = 1s, bat autoreload
-//   timerAlarmEnable(timer);  // enable timer
-// }
-
-// void setup() {
-//   Serial.begin(9600);
-//   pinMode(LED_PIN, OUTPUT);
-//   pinMode(BUZZER, OUTPUT);
-//   ledcSetup(0, 1000, 8);
-//   ledcAttachPin(BUZZER, 0);
-//   timer_init();
-  
-//   WiFi.mode(WIFI_STA);
-//   WiFi.begin(ssid, pass);
-//   Serial.print("Connecting to WiFi ..");
-//   while (WiFi.status() != WL_CONNECTED) {
-//     Serial.print('.');
-//     delay(500);
-//   }
-
-//   server.on("/", homePage);
-//   server.on("/time", handleTime);
-//   server.on("/saveSchedule", handleSaveSchedule);
-//   server.on("/saveReal", handleSaveRealTime);
-//   server.begin();
-//   Serial.println(WiFi.localIP());
-//   myTime.hour = 23;
-//   myTime.minute = 39;
-//   myTime.second = 50;
-//   myTime.hourAlarm.morning = 23;
-//   myTime.minuteAlarm.morning = 40;
-//   delay(1000);
-// }
-
-// void loop() {
-//   if(activeAlarm) {
-//     digitalWrite(LED_PIN, HIGH);
-//     tone(BUZZER, 1000); 
-//   } else {
-//     digitalWrite(LED_PIN, LOW);
-//     noTone(BUZZER); 
-//   }
-
-//   Serial.println("-------------------");
-//   Serial.print("Time: ");
-//   Serial.print(myTime.hour);  
-//   Serial.print(":");
-//   Serial.print(myTime.minute);
-//   Serial.print(":");
-//   Serial.println(myTime.second);
-//   Serial.println("Active alarm: " + String(activeAlarm));
-//   Serial.println("morning: " + String(myTime.hourAlarm.morning) + ":" + String(myTime.minuteAlarm.morning));
-//   Serial.println("noon: " + String(myTime.hourAlarm.afternoon) + ":" + String(myTime.minuteAlarm.afternoon));
-//   Serial.println("evening: " + String(myTime.hourAlarm.evening) + ":" + String(myTime.minuteAlarm.evening));
-//   Serial.println("Drawer: " + String(drawer));
-//   Serial.println("===================");
-//   delay(1000);
-//   server.handleClient(); 
-// }
-
-
+#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include "Time.h"
 #include "web.h"
 
-#define LED_PIN 8 
-#define BUZZER 7
 #define LED1 8
 #define LED2 9
 #define BUZZER 7
 #define BUTTON 6
 #define SDA 4
 #define SCL 5
-#define sensor1 10
-bool button_state = false;
+#define IR1 2
+#define IR2 3
+#define LDR_PIN 0
+#define LDR_LED 10
+
+const int channel = 1;
+const int freq = 5000;
+const int resolution = 8;
+
+volatile bool button_state = false;
 unsigned long pre_time = 0;
 unsigned long time2 = 0;
+volatile bool activeAlarm = false;
+volatile bool activeFlag  = false;
 
-bool activeAlarm = false;
-uint8_t status = 0;
-uint8_t drawer = 1;
-
+bool alarmFlag = false;
+uint8_t status = 0; 
+uint8_t drawer[3] = {1,1,1}; // ngan 1, ngan 2, ngan 3
+uint8_t currentDrawer = 1;
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 Time myTime;
 WebServer server(80);
 
-void setup() {
-  Serial.begin(9600);
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUZZER, OUTPUT);
-  ledcSetup(0, 1000, 8);
-  ledcAttachPin(BUZZER, 0);
-  timerInit();
-  webInit();
-  
+void IRAM_ATTR handleButton()
+{
+  if(activeAlarm && alarmFlag)
+    button_state = true;
 }
 
-void loop() {
-  if(activeAlarm) {
-    digitalWrite(LED_PIN, HIGH);
-    tone(BUZZER, 1000); 
-  } else {
-    digitalWrite(LED_PIN, LOW);
-    noTone(BUZZER); 
+void handleLDR()
+{
+  float LDR_VALUE = analogRead(LDR_PIN);
+  // Serial.println(LDR_VALUE);
+  // int LDR_LED_VALUE = map(LDR_VALUE, 0, 4095, 0, 255);
+  if(LDR_VALUE > 3700)
+    digitalWrite(LDR_LED, 1);
+  else 
+    digitalWrite(LDR_LED, 0);
+}
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(IR1, INPUT);
+  pinMode(IR2, INPUT);
+  pinMode(LDR_LED, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  // ledcSetup(channel, freq, resolution);
+  // ledcAttachPin(LDR_LED, channel);
+
+  ledcSetup(0, 1000, 8);
+  ledcAttachPin(BUZZER, 0);
+  //ledcAttachPin(LDR_LED, channel);
+
+  Wire.begin(SDA, SCL);
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+
+  pinMode(BUTTON, INPUT_PULLUP);
+  digitalWrite(BUZZER, LOW);
+
+  attachInterrupt(digitalPinToInterrupt(BUTTON), handleButton, FALLING);
+  timerInit();
+  webInit();
+}
+
+void loop()
+{
+
+  // bool irState1 = digitalRead(IR1);
+  // bool irState2 = digitalRead(IR2);
+  handleLDR();
+  // Serial.println(irState1);
+  // delay(100);
+  Serial.println(button_state);
+
+  Serial.println("Alarm: " + String(activeAlarm));
+  if (activeAlarm) // den gio uong thuoc{
+  {
+    //Serial.println("Alarm active");
+    if (alarmFlag)
+    {
+      tone(BUZZER, 1000);
+      status = 1; // den gio uong thuoc]
+      lcd.setCursor(6, 0);
+      lcd.print("TU THUOC");
+      lcd.setCursor(7, 1);
+      lcd.print(myTime.hour < 10 ? "0" : "" + String(myTime.hour) + ":" +(myTime.minute < 10 ? "0" : "") + String(myTime.minute));
+      lcd.setCursor(1, 2);
+      lcd.print("DEN GIO UONG THUOC");
+      lcd.setCursor(3,3);
+      lcd.print("NGAN THUOC: " + String(currentDrawer));
+      if (currentDrawer == 1) // ngan 1
+      {
+        // Serial.println("Ngan 1");
+        digitalWrite(LED1, 1);
+        digitalWrite(LED2, 0);
+        while (digitalRead(IR1) == 1 && digitalRead(IR2) == 0) // lay sai qua ngan 2
+        {
+          lcd.setCursor(6, 0);
+          lcd.print("TU THUOC");
+          lcd.setCursor(3,2);
+          lcd.print("SAI NGAN THUOC!!!");
+          digitalWrite(LED2, 1);
+          tone(BUZZER, 900);
+          delay(50);
+          digitalWrite(LED2, 0);
+          noTone(BUZZER);
+          delay(50);
+          lcd.clear();
+          
+          //lcd.clear();
+        }
+      }
+      else if (currentDrawer == 2)
+      {
+        // Serial.println("ngan 2");
+        digitalWrite(LED1, 0);
+        digitalWrite(LED2, 1);
+
+        while (digitalRead(IR1) == 0 && digitalRead(IR2) == 1) // lay sai qua ngan 1
+        {
+          
+          lcd.setCursor(0,2);
+          lcd.print(" SAI NGAN THUOC!!! ");
+          digitalWrite(LED1, 1);
+          tone(BUZZER, 900);
+          delay(50);
+          digitalWrite(LED1, 0);
+          noTone(BUZZER);
+          delay(50);
+          lcd.clear();
+        }
+      }
+
+      if (button_state) // da nhan thuoc
+      {
+        button_state = false;
+        alarmFlag = false;
+        activeFlag = false;
+        noTone(BUZZER);
+        digitalWrite(LED1, 0);
+        digitalWrite(LED2, 0);
+
+      }
+    }
+    else if(alarmFlag == false && activeFlag == false)
+    {
+      // Serial.println("Da nhan thuoc");
+      //lcd.clear();
+      lcd.setCursor(0, 2);
+      lcd.print("   DA NHAN THUOC   ");
+      lcd.setCursor(3,3);
+      lcd.print("              ");
+      // status = 2; // Da lay thuoc
+    }
+  }
+  else
+  {
+    // Serial.println("Chua den gio uong thuoc");
+    activeFlag = true;
+    alarmFlag = true;
+    digitalWrite(LED1, 0);
+    digitalWrite(LED2, 0);
+    noTone(BUZZER);
+    //lcd.clear();
+    lcd.setCursor(6, 0);
+    lcd.print("TU THUOC");
+    lcd.setCursor(7, 1);
+    lcd.print(myTime.hour < 10 ? "0" : "" + String(myTime.hour) + ":" +(myTime.minute < 10 ? "0" : "") + String(myTime.minute));
+    lcd.setCursor(0, 2);
+    lcd.print("    CHUA DEN GIO   ");
+    lcd.setCursor(3,3);
+    lcd.print("              ");
+
+
+    status = 0; // chua toi gio
   }
 
-  Serial.println("-------------------");
-  Serial.print("Time: ");
-  Serial.print(myTime.hour);  
-  Serial.print(":");
-  Serial.print(myTime.minute);
-  Serial.print(":");
-  Serial.println(myTime.second);
-  Serial.println("Active alarm: " + String(activeAlarm));
-  Serial.println("morning: " + String(myTime.hourAlarm.morning) + ":" + String(myTime.minuteAlarm.morning));
-  Serial.println("noon: " + String(myTime.hourAlarm.afternoon) + ":" + String(myTime.minuteAlarm.afternoon));
-  Serial.println("evening: " + String(myTime.hourAlarm.evening) + ":" + String(myTime.minuteAlarm.evening));
-  Serial.println("Drawer: " + String(drawer));
-  Serial.println("===================");
-  delay(1000);
-  server.handleClient(); 
+  server.handleClient();
 }
